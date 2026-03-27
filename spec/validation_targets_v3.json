@@ -1,0 +1,46 @@
+{
+  "geometry": {
+    "wing_area_m2": {
+      "target": 0.555,
+      "tolerance": 0.04
+    },
+    "wing_aspect_ratio": {
+      "target": 7.2,
+      "tolerance": 0.6
+    },
+    "canard_area_ratio": {
+      "target": 0.146,
+      "tolerance": 0.03
+    },
+    "wing_quarter_chord_sweep_deg": {
+      "target": 15.0,
+      "tolerance": 3.0
+    },
+    "canard_to_prop_radial_clearance_m": {
+      "minimum": 0.03
+    },
+    "canard_to_prop_x_clearance_m": {
+      "minimum": 0.08
+    },
+    "wake_clearance_m": {
+      "minimum": -0.25
+    },
+    "elevon_span_in_propwash_fraction": {
+      "minimum": 0.6
+    }
+  },
+  "forward_flight": {
+    "cm_alpha_max": 0.0,
+    "cl_alpha_min": 4.0,
+    "cl_alpha_max": 6.5,
+    "cn_beta_min": 0.010,
+    "cl_p_max": -0.2,
+    "cn_r_max": -0.002,
+    "trim_canard_abs_max_deg": 4.0
+  },
+  "control_effectiveness": {
+    "cm_delta_canard_min_per_rad": 0.18,
+    "cl_delta_elevon_diff_min_per_rad": 0.025,
+    "cm_delta_elevon_sym_powered_gain_min_ratio": 1.2
+  }
+}

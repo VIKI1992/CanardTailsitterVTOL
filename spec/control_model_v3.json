@@ -1,0 +1,86 @@
+{
+  "actuators": [
+    "throttle_left",
+    "throttle_right",
+    "elevon_left",
+    "elevon_right",
+    "canard_symmetric"
+  ],
+  "limits": {
+    "throttle_left": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "throttle_right": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "elevon_left_deg": {
+      "cruise_abs": 18.0,
+      "transition_abs": 22.0,
+      "hard_stop_abs": 25.0
+    },
+    "elevon_right_deg": {
+      "cruise_abs": 18.0,
+      "transition_abs": 22.0,
+      "hard_stop_abs": 25.0
+    },
+    "canard_symmetric_deg": {
+      "trim_target_abs": 4.0,
+      "forward_abs": 6.0,
+      "transition_abs": 15.0,
+      "hard_stop_abs": 22.0
+    }
+  },
+  "allocation": {
+    "cruise": {
+      "pitch": {
+        "canard_symmetric": 1.0,
+        "elevon_left": 0.22,
+        "elevon_right": 0.22
+      },
+      "roll": {
+        "elevon_left": 1.0,
+        "elevon_right": -1.0
+      },
+      "yaw": {
+        "throttle_left": -0.1,
+        "throttle_right": 0.1
+      }
+    },
+    "transition": {
+      "pitch": {
+        "canard_symmetric": 0.65,
+        "elevon_left": 0.8,
+        "elevon_right": 0.8
+      },
+      "roll": {
+        "elevon_left": 1.0,
+        "elevon_right": -1.0,
+        "throttle_left": 0.25,
+        "throttle_right": -0.25
+      },
+      "yaw": {
+        "throttle_left": -1.0,
+        "throttle_right": 1.0
+      }
+    },
+    "hover": {
+      "pitch": {
+        "elevon_left": 1.0,
+        "elevon_right": 1.0,
+        "canard_symmetric": 0.2
+      },
+      "roll": {
+        "elevon_left": 1.0,
+        "elevon_right": -1.0,
+        "throttle_left": 0.35,
+        "throttle_right": -0.35
+      },
+      "yaw": {
+        "throttle_left": -1.0,
+        "throttle_right": 1.0
+      }
+    }
+  }
+}

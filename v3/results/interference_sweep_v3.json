@@ -1,0 +1,42 @@
+[
+  {
+    "alpha_deg": 6.0,
+    "canard_deflection_deg": -6.0,
+    "wake_clearance_m": -0.029837949763369828
+  },
+  {
+    "alpha_deg": 6.0,
+    "canard_deflection_deg": 0.0,
+    "wake_clearance_m": -0.029837949763369828
+  },
+  {
+    "alpha_deg": 6.0,
+    "canard_deflection_deg": 6.0,
+    "wake_clearance_m": -0.07044037470616737
+  },
+  {
+    "alpha_deg": 6.0,
+    "canard_deflection_deg": 10.0,
+    "wake_clearance_m": -0.09883705471445783
+  },
+  {
+    "alpha_deg": 18.0,
+    "canard_deflection_deg": -6.0,
+    "wake_clearance_m": -0.11356621504281336
+  },
+  {
+    "alpha_deg": 18.0,
+    "canard_deflection_deg": 0.0,
+    "wake_clearance_m": -0.11356621504281336
+  },
+  {
+    "alpha_deg": 18.0,
+    "canard_deflection_deg": 6.0,
+    "wake_clearance_m": -0.16051715387094947
+  },
+  {
+    "alpha_deg": 18.0,
+    "canard_deflection_deg": 10.0,
+    "wake_clearance_m": -0.194773387402087
+  }
+]

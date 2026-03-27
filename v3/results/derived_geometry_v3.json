@@ -1,0 +1,21 @@
+{
+  "wing_area_m2": 0.44117500000000004,
+  "wing_aspect_ratio": 9.066696888989629,
+  "wing_mac_m": 0.22983475944919812,
+  "wing_mac_y_m": 0.4413578323038854,
+  "wing_mac_le_x_m": 0.04381252715286828,
+  "wing_quarter_chord_sweep_deg": 16.22499587638753,
+  "wing_projected_span_m": 2.0,
+  "canard_area_m2": 0.081,
+  "canard_area_ratio": 0.18360061200204,
+  "canard_quarter_chord_x_m": -0.46,
+  "canard_tip_y_m": 0.3,
+  "canard_tip_trailing_edge_x_m": -0.37,
+  "main_wing_x_at_canard_tip_m": -0.00228571428571428,
+  "main_wing_z_at_canard_tip_m": 0.0,
+  "canard_to_prop_radial_clearance_m": 0.058499999999999996,
+  "canard_to_prop_x_clearance_m": 0.47,
+  "elevon_span_in_propwash_fraction": 0.9690909090909089,
+  "wake_clearance_m": -0.194773387402087,
+  "required_cruise_cl": 0.5824545223498774
+}

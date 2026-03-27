@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.pyo
+.vsptime
+*.stl
+tools/
+.claude/
+
+# VSPAERO analysis artifacts
+*.adb
+*.adb.cases
+*.quad.cases
+*.case.*.dat
+*.csf
+*.cuts
+*.group.*
+*.history
+*.lod
+*.polar
+*.slc
+*.vkey
+*.vspaero
+*.vspgeom
+
+# Test files
+fuselage_test.vsp3

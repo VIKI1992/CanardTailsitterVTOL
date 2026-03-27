@@ -1,0 +1,186 @@
+{
+  "metadata": {
+    "name": "Canard Tailsitter V3",
+    "version": "3.3.0",
+    "units": "SI"
+  },
+  "wing": {
+    "name": "MainWing",
+    "airfoil": "SD7037",
+    "stations": [
+      {
+        "name": "root",
+        "leading_edge_x_m": -0.100,
+        "y_m": 0.0,
+        "z_m": 0.0,
+        "chord_m": 0.380,
+        "twist_deg": 1.5
+      },
+      {
+        "name": "inboard_break",
+        "leading_edge_x_m": 0.014,
+        "y_m": 0.35,
+        "z_m": 0.0,
+        "chord_m": 0.314,
+        "twist_deg": 0.5
+      },
+      {
+        "name": "outer_wing",
+        "leading_edge_x_m": 0.154,
+        "y_m": 0.78,
+        "z_m": 0.0,
+        "chord_m": 0.228,
+        "twist_deg": -1.0
+      },
+      {
+        "name": "blend_start",
+        "leading_edge_x_m": 0.180,
+        "y_m": 0.86,
+        "z_m": 0.008,
+        "chord_m": 0.200,
+        "twist_deg": -1.5
+      },
+      {
+        "name": "blend_mid",
+        "leading_edge_x_m": 0.200,
+        "y_m": 0.92,
+        "z_m": 0.040,
+        "chord_m": 0.175,
+        "twist_deg": -1.0
+      },
+      {
+        "name": "winglet_knee",
+        "leading_edge_x_m": 0.218,
+        "y_m": 0.96,
+        "z_m": 0.120,
+        "chord_m": 0.145,
+        "twist_deg": 0.0
+      },
+      {
+        "name": "winglet_tip",
+        "leading_edge_x_m": 0.238,
+        "y_m": 1.00,
+        "z_m": 0.250,
+        "chord_m": 0.100,
+        "twist_deg": 0.0
+      }
+    ]
+  },
+  "canard": {
+    "name": "Canard",
+    "airfoil": "NACA0009",
+    "pivot_fraction": 0.33,
+    "baseline_incidence_deg": 2.0,
+    "stations": [
+      {
+        "name": "root",
+        "leading_edge_x_m": -0.380,
+        "y_m": 0.0,
+        "z_m": 0.035,
+        "chord_m": 0.16,
+        "twist_deg": 2.0
+      },
+      {
+        "name": "tip",
+        "leading_edge_x_m": -0.360,
+        "y_m": 0.30,
+        "z_m": 0.035,
+        "chord_m": 0.11,
+        "twist_deg": 2.0
+      }
+    ],
+    "deflection_limits_deg": {
+      "trim_target_abs": 4.0,
+      "forward_command_abs": 6.0,
+      "transition_abs": 10.0,
+      "hard_stop_abs": 22.0
+    }
+  },
+  "control_surfaces": {
+    "elevon_left": {
+      "surface_name": "ElevonLeft",
+      "start_y_m": 0.35,
+      "end_y_m": 0.90,
+      "chord_fraction": 0.24,
+      "hinge_fraction_from_le": 0.76,
+      "cruise_limit_deg": 18.0,
+      "hover_limit_deg": 22.0,
+      "hard_stop_deg": 25.0
+    },
+    "elevon_right": {
+      "surface_name": "ElevonRight",
+      "start_y_m": 0.35,
+      "end_y_m": 0.90,
+      "chord_fraction": 0.24,
+      "hinge_fraction_from_le": 0.76,
+      "cruise_limit_deg": 18.0,
+      "hover_limit_deg": 22.0,
+      "hard_stop_deg": 25.0
+    }
+  },
+  "fuselage": {
+    "name": "Fuselage",
+    "stations": [
+      {
+        "name": "nose_point",
+        "x_m": -0.52,
+        "width_m": 0.008,
+        "height_m": 0.010,
+        "shape": "point"
+      },
+      {
+        "name": "forward_body",
+        "x_m": -0.24,
+        "width_m": 0.120,
+        "height_m": 0.125,
+        "shape": "ellipse"
+      },
+      {
+        "name": "widest",
+        "x_m": 0.00,
+        "width_m": 0.155,
+        "height_m": 0.152,
+        "shape": "ellipse"
+      },
+      {
+        "name": "aft_body",
+        "x_m": 0.24,
+        "width_m": 0.110,
+        "height_m": 0.108,
+        "shape": "ellipse"
+      },
+      {
+        "name": "tail_point",
+        "x_m": 0.50,
+        "width_m": 0.008,
+        "height_m": 0.010,
+        "shape": "point"
+      }
+    ],
+    "tessellation_w": 49
+  },
+  "propulsion": {
+    "motor_count": 2,
+    "prop_diameter_m": 0.533,
+    "motor_x_m": 0.070,
+    "motor_y_m": 0.625,
+    "motor_z_m": 0.020,
+    "left_rotation": "CW",
+    "right_rotation": "CCW"
+  },
+  "mass_properties": {
+    "analysis_mass_kg": 5.2,
+    "cg_x_m": 0.0
+  },
+  "analysis_conditions": {
+    "cruise_speed_m_s": 18.0,
+    "transition_speed_m_s": 12.0,
+    "air_density_kg_m3": 1.225,
+    "cruise_alpha_deg": 6.0,
+    "transition_alpha_deg": 18.0
+  },
+  "power_effects": {
+    "elevon_dynamic_pressure_gain_powered": 1.55,
+    "canard_dynamic_pressure_gain_powered": 1.0
+  }
+}

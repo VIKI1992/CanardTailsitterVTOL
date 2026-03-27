@@ -1,0 +1,32 @@
+{
+  "geometry": {
+    "wing_area_m2": 0.5553,
+    "wing_aspect_ratio": 7.203313524221142,
+    "wing_quarter_chord_sweep_deg": 15.002716020768627,
+    "canard_area_ratio": 0.14586709886547813,
+    "canard_to_prop_radial_clearance_m": 0.058499999999999996,
+    "canard_to_prop_x_clearance_m": 0.44,
+    "wake_clearance_m": -0.194773387402087,
+    "elevon_span_in_propwash_fraction": 0.9690909090909089
+  },
+  "forward_flight": {
+    "CL": 0.49450148826914114,
+    "CD": 0.05735056904730466,
+    "Cm": -0.0021678665515422056,
+    "required_cruise_cl": 0.4627487374350931,
+    "cl_alpha": 4.581795602071463,
+    "cm_alpha": -0.6297219740382247,
+    "cn_beta": 0.02044030518063316,
+    "cl_beta": -0.1673455989748865,
+    "cl_p": -0.5246174024643141,
+    "cn_r": -0.015642802157356944,
+    "trim_canard_deg": 0.16629019784285967
+  },
+  "control_effectiveness": {
+    "cm_delta_canard_per_rad": 0.7497306430547964,
+    "cm_delta_elevon_sym_per_rad": 0.22693179545032052,
+    "cm_delta_elevon_sym_powered_per_rad": 0.3517442829479968,
+    "cm_delta_elevon_sym_powered_gain_ratio": 1.55,
+    "cl_delta_elevon_diff_per_rad": 0.07816937641161112
+  }
+}
