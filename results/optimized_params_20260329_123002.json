@@ -1,0 +1,72 @@
+{
+  "timestamp": "20260329_123002",
+  "baseline_ld": 8.670658245821993,
+  "best_candidate": {
+    "rank": 1,
+    "surrogate_ld": 9.62645336334189,
+    "aero_ld": 10.654027215604312,
+    "aero_cl": 0.14807099460703965,
+    "aero_cd": 0.0138971243064753,
+    "aero_cm": -0.02096305317811013,
+    "delta_pct": 22.87448870439715,
+    "n_violations": 2,
+    "violation_details": [
+      "canard_area_ratio: 0.090 target=0.146\u00b10.03",
+      "cl_pos: CL=0.148"
+    ],
+    "design_vector_raw": {
+      "wing_root_chord_mm": 427.4058794975281,
+      "wing_tip_chord_mm": 233.50475788116455,
+      "wing_taper_knee_frac": 0.7,
+      "wing_washout_tip_deg": 0.0,
+      "wing_root_incidence_deg": 2.0,
+      "wing_le_sweep_deg": 13.94149625301361,
+      "canard_area_ratio": 0.08950169682502747,
+      "canard_incidence_deg": -1.0,
+      "canard_x_le_root_mm": -377.6835370063782,
+      "cruise_velocity_ms": 24.492106437683105,
+      "cruise_alpha_deg": 2.0,
+      "wing_ar_scale": 1.0869378507137297
+    }
+  },
+  "surrogate_metrics": {
+    "CL_r2": 0.9948187470436096,
+    "CL_mae": 0.05266094580292702,
+    "CD_r2": 0.9835858345031738,
+    "CD_mae": 0.0985066145658493,
+    "Cm_r2": 0.994878888130188,
+    "Cm_mae": 0.0548708476126194
+  },
+  "all_verified_candidates": [
+    {
+      "rank": 1,
+      "aero_ld": 10.654027215604312,
+      "n_violations": 2,
+      "surrogate_ld": 9.62645336334189
+    },
+    {
+      "rank": 2,
+      "aero_ld": 10.635046895389522,
+      "n_violations": 2,
+      "surrogate_ld": 9.562662074664996
+    },
+    {
+      "rank": 3,
+      "aero_ld": 10.610176697969187,
+      "n_violations": 2,
+      "surrogate_ld": 9.565508135561188
+    },
+    {
+      "rank": 4,
+      "aero_ld": 10.652267664767093,
+      "n_violations": 2,
+      "surrogate_ld": 9.570721889058838
+    },
+    {
+      "rank": 5,
+      "aero_ld": 10.653358092362616,
+      "n_violations": 2,
+      "surrogate_ld": 9.5581887118545
+    }
+  ]
+}

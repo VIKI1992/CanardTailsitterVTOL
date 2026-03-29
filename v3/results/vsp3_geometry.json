@@ -1,0 +1,169 @@
+{
+  "wing": {
+    "stations": [
+      {
+        "name": "root",
+        "y_m": 0.0,
+        "z_m": 0.0,
+        "chord_m": 0.4553821992874145,
+        "le_x_m": -0.1,
+        "twist_deg": 2.0
+      },
+      {
+        "name": "inboard_break",
+        "y_m": 0.40249999999999997,
+        "z_m": 0.0,
+        "chord_m": 0.3706250525590701,
+        "le_x_m": -0.014445983927816111,
+        "twist_deg": 1.1025641025641026
+      },
+      {
+        "name": "outer_wing",
+        "y_m": 0.8969999999999999,
+        "z_m": 0.0,
+        "chord_m": 0.18554311990737915,
+        "le_x_m": 0.09066323581800984,
+        "twist_deg": 2.0
+      },
+      {
+        "name": "blend_start",
+        "y_m": 0.9889999999999999,
+        "z_m": 0.0092,
+        "chord_m": 0.1627571227257712,
+        "le_x_m": 0.11021843949165186,
+        "twist_deg": 0.5
+      },
+      {
+        "name": "blend_mid",
+        "y_m": 1.058,
+        "z_m": 0.046,
+        "chord_m": 0.14241248238504978,
+        "le_x_m": 0.12488484224688343,
+        "twist_deg": 1.0
+      },
+      {
+        "name": "winglet_knee",
+        "y_m": 1.1039999999999999,
+        "z_m": 0.13799999999999998,
+        "chord_m": 0.1179989139761841,
+        "le_x_m": 0.1346624440837044,
+        "twist_deg": 2.0
+      },
+      {
+        "name": "winglet_tip",
+        "y_m": 1.15,
+        "z_m": 0.2875,
+        "chord_m": 0.0813785613628856,
+        "le_x_m": 0.14444004592052542,
+        "twist_deg": 2.0
+      }
+    ],
+    "airfoil": "SD7037",
+    "root_incidence_deg": 2.0
+  },
+  "canard": {
+    "stations": [
+      {
+        "name": "root",
+        "y_m": 0.0,
+        "z_m": 0.035,
+        "chord_m": 0.23252442189010067,
+        "le_x_m": -0.48,
+        "twist_deg": -0.7505976259708405
+      },
+      {
+        "name": "tip",
+        "y_m": 0.3,
+        "z_m": 0.035,
+        "chord_m": 0.15986054004944422,
+        "le_x_m": -0.45999999999999996,
+        "twist_deg": -0.7505976259708405
+      }
+    ],
+    "airfoil": "NACA0009",
+    "incidence_deg": -0.7505976259708405
+  },
+  "fuselage": {
+    "stations": [
+      {
+        "name": "nose",
+        "x_m": -0.52,
+        "shape": "ellipse",
+        "width_m": 0.055,
+        "height_m": 0.055,
+        "corner_radius_m": null
+      },
+      {
+        "name": "canard_le",
+        "x_m": -0.47,
+        "shape": "ellipse",
+        "width_m": 0.095,
+        "height_m": 0.11,
+        "corner_radius_m": null
+      },
+      {
+        "name": "canard_mid",
+        "x_m": -0.36,
+        "shape": "ellipse",
+        "width_m": 0.115,
+        "height_m": 0.125,
+        "corner_radius_m": null
+      },
+      {
+        "name": "forward_body",
+        "x_m": -0.24,
+        "shape": "ellipse",
+        "width_m": 0.13,
+        "height_m": 0.135,
+        "corner_radius_m": null
+      },
+      {
+        "name": "widest",
+        "x_m": 0.0,
+        "shape": "ellipse",
+        "width_m": 0.155,
+        "height_m": 0.152,
+        "corner_radius_m": null
+      },
+      {
+        "name": "aft_body",
+        "x_m": 0.24,
+        "shape": "ellipse",
+        "width_m": 0.11,
+        "height_m": 0.108,
+        "corner_radius_m": null
+      },
+      {
+        "name": "tail_taper",
+        "x_m": 0.42,
+        "shape": "ellipse",
+        "width_m": 0.04,
+        "height_m": 0.04,
+        "corner_radius_m": null
+      },
+      {
+        "name": "tail_point",
+        "x_m": 0.5,
+        "shape": "point",
+        "width_m": 0.008,
+        "height_m": 0.01,
+        "corner_radius_m": null
+      }
+    ]
+  },
+  "propulsion": {
+    "motor_x_m": 0.07,
+    "motor_y_m": 0.625,
+    "motor_z_m": 0.02,
+    "prop_diameter_m": 0.533,
+    "left_rotation": "CW",
+    "right_rotation": "CCW"
+  },
+  "elevon": {
+    "start_y_m": 0.35,
+    "end_y_m": 0.75,
+    "hinge_frac": 0.76
+  },
+  "out_vsp3": "/home/viktor/Public/projects/CanardTailsitterVTOL/v3/results/fixed_wing_tailsitter_optimized.vsp3",
+  "source_json": "optimized_params_20260329_135310.json"
+}

@@ -1,0 +1,67 @@
+{
+  "timestamp": "20260329_135310",
+  "baseline_ld": 8.670658245821993,
+  "best_candidate": {
+    "rank": 1,
+    "surrogate_ld": 9.479410085884073,
+    "aero_ld": 9.5345603992082,
+    "aero_cl": 0.4863865581347099,
+    "aero_cd": 0.05101200298806665,
+    "aero_cm": 0.001560476687563642,
+    "delta_pct": 9.963511757222873,
+    "n_violations": 0,
+    "violation_details": [],
+    "design_vector_raw": {
+      "wing_root_chord_mm": 455.38219928741455,
+      "wing_tip_chord_mm": 185.54311990737915,
+      "wing_taper_knee_frac": 0.7,
+      "wing_washout_tip_deg": 0.0,
+      "wing_root_incidence_deg": 2.0,
+      "wing_le_sweep_deg": 12.0,
+      "canard_area_ratio": 0.17266824722290042,
+      "canard_incidence_deg": -0.7505976259708405,
+      "canard_x_le_root_mm": -480.0,
+      "wing_ar_scale": 1.15
+    }
+  },
+  "surrogate_metrics": {
+    "CL_r2": 0.9964291453361511,
+    "CL_mae": 0.04380793869495392,
+    "CD_r2": 0.9866663217544556,
+    "CD_mae": 0.08630739897489548,
+    "Cm_r2": 0.995198130607605,
+    "Cm_mae": 0.05272556468844414
+  },
+  "all_verified_candidates": [
+    {
+      "rank": 1,
+      "aero_ld": 9.5345603992082,
+      "n_violations": 0,
+      "surrogate_ld": 9.479410085884073
+    },
+    {
+      "rank": 2,
+      "aero_ld": 9.516988310831085,
+      "n_violations": 0,
+      "surrogate_ld": 9.46522118767605
+    },
+    {
+      "rank": 3,
+      "aero_ld": 9.488993159887405,
+      "n_violations": 0,
+      "surrogate_ld": 9.452173274797172
+    },
+    {
+      "rank": 4,
+      "aero_ld": 9.511392389213423,
+      "n_violations": 0,
+      "surrogate_ld": 9.458883676547908
+    },
+    {
+      "rank": 5,
+      "aero_ld": 9.349115781885303,
+      "n_violations": 0,
+      "surrogate_ld": 9.254438453607268
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# Neural network design optimizer dependencies
+# Install in addition to requirements.txt:
+#   pip install -r requirements.txt
+#   pip install -r requirements_optimizer.txt
+#
+# CPU-only PyTorch (recommended — GPU not required for this surrogate):
+#   pip install torch>=2.2.0 --index-url https://download.pytorch.org/whl/cpu
+# Standard install (auto-selects CPU or CUDA):
+#   pip install torch>=2.2.0
+
+torch>=2.2.0
+scikit-learn>=1.5.0
+matplotlib>=3.9.0
+tqdm>=4.66.0
+pandas>=2.2.0
+optuna>=3.6.0
