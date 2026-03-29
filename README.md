@@ -6,114 +6,110 @@ A parametric design and analysis pipeline for a twin-motor canard fixed-wing tai
 
 | Parameter | Value |
 |-----------|-------|
-| Wingspan | 2.0 m |
-| Wing area | 0.56 m² |
-| Aspect ratio | ~9 |
-| Root chord | 380 mm |
+| Wingspan | 2.65 m (total incl. winglets) |
+| Wing airfoil | SD7037 |
+| Root chord | 455 mm |
 | MTOW | 5.2 kg |
 | Cruise speed | 18 m/s (65 km/h) |
-| Propulsion | Twin fixed counter-rotating props, 533 mm (21") diameter |
-| Canard | All-moving, NACA 0009, pivots at 33% chord |
-| Wing airfoil | SD7037 |
-| Elevons | 24% chord, propwash-fed for hover pitch/roll control |
-| Winglets | Blended transition, 250 mm height, NACA 0009 |
-
-## Project Structure
-
-```
-FixedWingTaisitterV2/
-  airfoils/           Airfoil coordinate data (sd7037.dat)
-  research/           Research digest informing the design
-  spec/               Authoritative design specification (source of truth)
-    parameters_v3.json        All geometry, mass, propulsion, analysis parameters
-    validation_targets_v3.json  Pass/fail thresholds
-    control_model_v3.json       Control allocation per flight regime
-    design_spec_v3.md           Design specification document
-    design_rationale_v4.md      Every design decision with sources
-  tools/              Bundled OpenVSP 3.48.2 (win64)
-  v3/                 Active implementation
-    model/
-      spec.py           Typed dataclass parameter loader
-      geometry.py       Derived geometry calculations
-      analysis.py       AeroSandbox aerodynamic validation
-      openvsp_builder.py  OpenVSP vspscript generator (legacy path)
-      __init__.py       Package API re-exports
-    scripts/
-      build_openvsp_python.py   Build OpenVSP model via Python API (primary)
-      build_openvsp_v3.py       Build via vspscript (legacy path)
-      validate_design_v3.py     Run 18-check validation suite
-      evaluate_independent_v3.py  Independent sanity checks
-    results/            Generated artifacts (vsp3, reports, metrics)
-  requirements.txt    Python dependencies
-```
+| Propulsion | Twin fixed counter-rotating props, 533 mm diameter |
+| Canard | All-moving, NACA 0009, 600 mm span |
+| Elevons | 24% chord, y=0.35-0.75 semi-span (straight wing only) |
+| Winglets | Blended transition, 288 mm height |
+| Fuselage | 1.02 m length, blunt elliptical nose, 155 mm max width |
 
 ## Quick Start
 
 ### Prerequisites
 
-- Python 3.13 (installed locally)
-- Dependencies: `pip install -r requirements.txt`
-- OpenVSP 3.48.2 is bundled under `tools/` (no separate install needed)
+- Python 3.12+
+- OpenVSP 3.48.2 installed system-wide (`sudo dpkg -i openvsp.deb`)
+- `pip install -r requirements.txt`
 
-### Build the OpenVSP Model
+### Build the VSP3 Model
 
-```powershell
-python v3/scripts/build_openvsp_python.py
+```bash
+PYTHONPATH=/opt/OpenVSP/python/openvsp:/opt/OpenVSP/python/degen_geom:/opt/OpenVSP/python/utilities \
+python3 gen_vsp3_api.py
 ```
 
-This generates `v3/results/fixed_wing_tailsitter_v3.vsp3` using the OpenVSP Python API directly. The model includes the main wing with smooth winglet transition, canard, fuselage, and prop disks with correct dimensions and symmetry.
+Generates `v3/results/fixed_wing_tailsitter_optimized.vsp3` plus STEP, IGES, and STL exports.
 
-### Run Validation
+### Selective Export (e.g. skip propellers)
 
-```powershell
-python v3/scripts/validate_design_v3.py
+```bash
+# Exclude specific components
+python3 gen_vsp3_api.py --exclude props
+python3 gen_vsp3_api.py --exclude props,canard
+
+# Or include only specific components
+python3 gen_vsp3_api.py --only wing,fuselage
 ```
 
-Runs 18 checks covering geometry (area, AR, sweep, clearances), stability (Cm_alpha, Cn_beta, damping), trim, and control effectiveness. Current status: **18 pass / 0 fail**.
+Valid component names: `wing`, `canard`, `fuselage`, `props`
 
-### Run Independent Evaluation
-
-```powershell
-python v3/scripts/evaluate_independent_v3.py
-```
-
-Re-derives all geometry and metrics from scratch, compares against saved artifacts, and runs additional sanity checks (L/D, wing loading, static margin, control power ratios). Outputs `v3/results/independent_evaluation_v3.md`.
+The VSP3 file always contains all components. Only the STEP/IGES/STL exports are filtered. Per-component STL files are also generated for multi-body CAD import.
 
 ### Open in OpenVSP
 
-```powershell
-& 'tools\OpenVSP-3.48.2\OpenVSP-3.48.2-win64\vsp.exe' 'v3\results\fixed_wing_tailsitter_v3.vsp3'
+```bash
+vsp v3/results/fixed_wing_tailsitter_optimized.vsp3
+```
+
+### Upload to Onshape
+
+```bash
+python3 upload_onshape.py
+```
+
+Combines per-component STLs into a single binary STL and uploads to a new Onshape document. Each component appears as a separate solid body in one Part Studio.
+
+Requires Onshape API credentials in `.env` (not tracked by git):
+```
+ONSHAPE_ACCESS_KEY=your_access_key
+ONSHAPE_SECRET_KEY=your_secret_key
+```
+
+### Run Surrogate Optimizer
+
+```bash
+pip install -r requirements_optimizer.txt
+python3 -m v3.optimization.sweep        # generate training data
+python3 -m v3.optimization.surrogate     # train neural surrogate
+python3 -m v3.optimization.nn_optimize   # multi-objective optimization
+```
+
+## Project Structure
+
+```
+CanardTailsitterVTOL/
+  gen_vsp3_api.py          Build VSP3 model via OpenVSP Python API
+  upload_onshape.py        Upload to Onshape (per-component, multi-body)
+  deflection_viz.py        AeroSandbox VLM deflection visualization
+  gen_optimized_vsp3.py    Apply optimizer results to VSP3
+  prepare_vsp3_data.py     Prepare geometry JSON from optimizer output
+  v3/
+    optimization/          Surrogate-based optimizer
+      design_space.py        Design variable bounds
+      sweep.py               Parameter sweep / training data
+      surrogate.py           Neural network surrogate model
+      nn_optimize.py         Multi-objective optimization
+      objectives.py          Objective functions
+    results/               Generated artifacts
+      vsp3_geometry.json     Geometry definition (source of truth for gen_vsp3_api.py)
+      *.vsp3, *.step, *.iges, *.stl   Model exports
+    model/                 Typed parameter loader and analysis
+  spec/                    Design specification and rationale
+  airfoils/                Airfoil coordinate data
+  research/                Literature review
+  checkpoints/             Surrogate model weights
+  data/                    Training sweep data
+  results/                 Optimizer output parameters
 ```
 
 ## Design Highlights
 
-- **Canard configuration**: All-moving symmetric canard at the nose tip provides pitch trim and control. Pivots as one unit around an axis at 33% chord from the leading edge.
-- **Propwash-fed elevons**: Elevons on the main wing panel (35-78% semi-span) sit within the propeller slipstream for hover/transition pitch and roll authority.
-- **Smooth winglet transition**: Wing-to-winglet blends through 7 stations with a gradual dihedral sweep curve (0° to 73°), providing directional stability without a separate vertical tail.
-- **Control allocation**: Blended across flight regimes — canard dominates pitch in cruise, elevons dominate in hover, differential thrust provides yaw.
-
-## Key Design Documents
-
-- [Design Rationale](spec/design_rationale_v4.md) — every geometry decision traced to a source (Scholz wing design handbook, NASA canard studies, real drone surveys)
-- [Design Specification](spec/design_spec_v3.md) — configuration overview
-- [Research Digest](research/research_digest.md) — literature review informing the design
-- [Control Model](spec/control_model_v3.json) — actuator allocation for cruise/transition/hover
-
-## Validation Summary
-
-| Category | Checks | Status |
-|----------|--------|--------|
-| Wing geometry (area, AR, sweep) | 4 | Pass |
-| Clearances (canard-prop, wake, propwash) | 4 | Pass |
-| Stability (Cm_alpha, Cn_beta, damping) | 6 | Pass |
-| Trim & control effectiveness | 4 | Pass |
-| **Total** | **18** | **18 pass / 0 fail** |
-
-## Dependencies
-
-Listed in `requirements.txt`:
-- `aerosandbox` — vortex lattice / aero buildup solver
-- `numpy` — numerical computation
-- `scipy` — optimization and interpolation
-
-OpenVSP 3.48.2 is bundled in `tools/` with its Python packages (`openvsp`, `degen_geom`, `utilities`, `openvsp_config`).
+- **Canard configuration**: All-moving symmetric canard provides pitch trim and control
+- **Propwash-fed elevons**: On the straight wing panel within propeller slipstream for hover authority
+- **Smooth winglet transition**: 7-station blended dihedral curve (0-73deg) for directional stability
+- **Blunt nose fuselage**: 8-station loft with round end cap; canard root fully enveloped
+- **OpenVSP to Onshape pipeline**: Automated export with selective component filtering and per-body import
