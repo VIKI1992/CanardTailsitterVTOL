@@ -24,3 +24,4 @@ tools/
 
 # Test files
 fuselage_test.vsp3
+.env

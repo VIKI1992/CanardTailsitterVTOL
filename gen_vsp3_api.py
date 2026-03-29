@@ -256,4 +256,27 @@ print(f"Props  — diameter={diameter*1000:.0f} mm, y=±{motor_y:.3f} m")
 Path(out_path).parent.mkdir(parents=True, exist_ok=True)
 vsp.WriteVSPFile(out_path, 0)
 print(f"\nWritten: {out_path}")
+
+# ---- EXPORT FOR ONSHAPE (CompGeom → STEP, STL) ----------------
+# Run CompGeom to trim/intersect surfaces into watertight shells
+print("Running CompGeom...")
+comp_geom_txt = out_path.replace(".vsp3", "_compgeom.txt")
+vsp.SetComputationFileName(vsp.COMP_GEOM_TXT_TYPE, comp_geom_txt)
+mesh_id = vsp.ComputeCompGeom(vsp.SET_ALL, False, vsp.COMP_GEOM_TXT_TYPE)
+print(f"  CompGeom mesh ID: {mesh_id}")
+
+step_path = out_path.replace(".vsp3", ".step")
+stl_path  = out_path.replace(".vsp3", ".stl")
+iges_path = out_path.replace(".vsp3", ".iges")
+
+vsp.ExportFile(step_path, vsp.SET_ALL, vsp.EXPORT_STEP)
+print(f"STEP:    {step_path}")
+
+vsp.ExportFile(iges_path, vsp.SET_ALL, vsp.EXPORT_IGES)
+print(f"IGES:    {iges_path}")
+
+# STL from CompGeom mesh — guaranteed viewable bodies in Onshape
+vsp.ExportFile(stl_path, vsp.SET_ALL, vsp.EXPORT_STL)
+print(f"STL:     {stl_path}")
+
 vsp.ClearVSPModel()
