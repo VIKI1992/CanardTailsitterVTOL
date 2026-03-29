@@ -1,16 +1,34 @@
 """
 gen_vsp3_api.py — Build optimized VSP3 using official OpenVSP Python API.
 
-Run with:
-  LD_LIBRARY_PATH=/tmp/libglew_extract/usr/lib/x86_64-linux-gnu:/tmp/libcminpack_extract/usr/lib/x86_64-linux-gnu:/tmp/openvsp_extract/opt/OpenVSP \
-  PYTHONPATH=/tmp/openvsp_extract/opt/OpenVSP/python/openvsp:/tmp/openvsp_extract/opt/OpenVSP/python/degen_geom:/tmp/openvsp_extract/opt/OpenVSP/python/utilities \
-  /tmp/openvsp_venv/bin/python3 gen_vsp3_api.py
+Usage:
+  python3 gen_vsp3_api.py                      # export all components
+  python3 gen_vsp3_api.py --exclude props       # skip propellers
+  python3 gen_vsp3_api.py --exclude props,canard # skip props and canard
+  python3 gen_vsp3_api.py --only wing,fuselage  # export only these
+
+Valid component names: wing, canard, fuselage, props
 """
+import argparse
 import json
 import math
 from pathlib import Path
 
 import openvsp as vsp
+
+parser = argparse.ArgumentParser(description="Build VSP3 and export for Onshape")
+parser.add_argument("--exclude", type=str, default="",
+                    help="Comma-separated components to exclude from export (wing,canard,fuselage,props)")
+parser.add_argument("--only", type=str, default="",
+                    help="Comma-separated components to include (overrides --exclude)")
+args = parser.parse_args()
+
+ALL_COMPONENTS = {"wing", "canard", "fuselage", "props"}
+if args.only:
+    export_components = {c.strip() for c in args.only.split(",")} & ALL_COMPONENTS
+else:
+    exclude = {c.strip() for c in args.exclude.split(",") if c.strip()}
+    export_components = ALL_COMPONENTS - exclude
 
 REPO = Path(__file__).parent
 geo = json.loads((REPO / "v3" / "results" / "vsp3_geometry.json").read_text())
@@ -59,6 +77,9 @@ def y_to_eta(y_m: float, stations: list) -> float:
 # BUILD MODEL
 # ============================================================
 
+# Track geom IDs by component name for selective export
+geom_ids = {}  # component_name -> [geom_id, ...]
+
 vsp.ClearVSPModel()
 
 # ---- WING -------------------------------------------------
@@ -67,6 +88,7 @@ root_twist = ws[0]["twist_deg"]
 
 wing_id = vsp.AddGeom("WING", "")
 vsp.SetGeomName(wing_id, "Wing")
+geom_ids["wing"] = [wing_id]
 
 # NOTE: use X_Rel_Location not X_Location — the latter is read-only world coords
 sp(wing_id, "X_Rel_Location", "XForm", ws[0]["le_x_m"])
@@ -146,6 +168,7 @@ cs = geo["canard"]["stations"]  # 2 stations
 
 canard_id = vsp.AddGeom("WING", "")
 vsp.SetGeomName(canard_id, "Canard")
+geom_ids["canard"] = [canard_id]
 
 sp(canard_id, "X_Rel_Location", "XForm", cs[0]["le_x_m"])
 sp(canard_id, "Y_Rel_Location", "XForm", 0.0)
@@ -183,6 +206,7 @@ fuse_len = x_tail - x_nose
 
 fuse_id = vsp.AddGeom("FUSELAGE", "")
 vsp.SetGeomName(fuse_id, "Fuselage")
+geom_ids["fuselage"] = [fuse_id]
 
 sp(fuse_id, "X_Rel_Location", "XForm", x_nose)
 sp(fuse_id, "Y_Rel_Location", "XForm", 0.0)
@@ -221,6 +245,8 @@ for i, st in enumerate(fs):
         if p_h:
             vsp.SetParmVal(p_h, st["height_m"])
 
+# Close the nose with a round end cap (CapUMinOption: 0=none, 1=flat, 2=round, 3=edge, 4=sharp)
+sp(fuse_id, "CapUMinOption", "EndCap", 2.0)   # round nose cap
 vsp.Update()
 print(f"Fuselage — length={fuse_len:.3f} m  ({x_nose:.3f}..{x_tail:.3f}), {n_needed} stations")
 
@@ -230,12 +256,14 @@ diameter  = prop_data["prop_diameter_m"]
 motor_x   = prop_data["motor_x_m"]
 motor_y   = prop_data["motor_y_m"]
 motor_z   = prop_data["motor_z_m"]
+geom_ids["props"] = []
 
 for side, rot_dir in [(-1, prop_data["left_rotation"]),
                       ( 1, prop_data["right_rotation"])]:
     prop_id = vsp.AddGeom("PROP", "")
     name    = "Prop_Left" if side < 0 else "Prop_Right"
     vsp.SetGeomName(prop_id, name)
+    geom_ids["props"].append(prop_id)
 
     sp(prop_id, "X_Rel_Location", "XForm", motor_x)
     sp(prop_id, "Y_Rel_Location", "XForm", side * motor_y)
@@ -257,26 +285,58 @@ Path(out_path).parent.mkdir(parents=True, exist_ok=True)
 vsp.WriteVSPFile(out_path, 0)
 print(f"\nWritten: {out_path}")
 
-# ---- EXPORT FOR ONSHAPE (CompGeom → STEP, STL) ----------------
-# Run CompGeom to trim/intersect surfaces into watertight shells
+# ---- EXPORT FOR ONSHAPE (selective CompGeom → STEP, STL) ------
+# Build export set: SET_A (index 3) contains only selected components
+EXPORT_SET = 3  # SET_A
+excluded = ALL_COMPONENTS - export_components
+if excluded:
+    print(f"Export excluding: {', '.join(sorted(excluded))}")
+
+# Clear all geoms from SET_A, then add only the selected ones
+for comp, ids in geom_ids.items():
+    for gid in ids:
+        vsp.SetSetFlag(gid, EXPORT_SET, comp in export_components)
+vsp.Update()
+
+# Run CompGeom on the export set
 print("Running CompGeom...")
 comp_geom_txt = out_path.replace(".vsp3", "_compgeom.txt")
 vsp.SetComputationFileName(vsp.COMP_GEOM_TXT_TYPE, comp_geom_txt)
-mesh_id = vsp.ComputeCompGeom(vsp.SET_ALL, False, vsp.COMP_GEOM_TXT_TYPE)
+mesh_id = vsp.ComputeCompGeom(EXPORT_SET, False, vsp.COMP_GEOM_TXT_TYPE)
 print(f"  CompGeom mesh ID: {mesh_id}")
 
 step_path = out_path.replace(".vsp3", ".step")
 stl_path  = out_path.replace(".vsp3", ".stl")
 iges_path = out_path.replace(".vsp3", ".iges")
 
-vsp.ExportFile(step_path, vsp.SET_ALL, vsp.EXPORT_STEP)
+vsp.ExportFile(step_path, EXPORT_SET, vsp.EXPORT_STEP)
 print(f"STEP:    {step_path}")
 
-vsp.ExportFile(iges_path, vsp.SET_ALL, vsp.EXPORT_IGES)
+vsp.ExportFile(iges_path, EXPORT_SET, vsp.EXPORT_IGES)
 print(f"IGES:    {iges_path}")
 
-# STL from CompGeom mesh — guaranteed viewable bodies in Onshape
-vsp.ExportFile(stl_path, vsp.SET_ALL, vsp.EXPORT_STL)
+# STL combined — single body
+vsp.ExportFile(stl_path, EXPORT_SET, vsp.EXPORT_STL)
 print(f"STL:     {stl_path}")
+
+# Delete combined CompGeom mesh before per-component exports
+vsp.DeleteGeom(mesh_id)
+vsp.Update()
+
+# Per-component STL exports — each becomes a separate body in Onshape
+print("Per-component STL exports:")
+for comp in sorted(export_components):
+    # Set only this component in the export set
+    for c, ids in geom_ids.items():
+        for gid in ids:
+            vsp.SetSetFlag(gid, EXPORT_SET, c == comp)
+    vsp.Update()
+
+    comp_mesh_id = vsp.ComputeCompGeom(EXPORT_SET, False, vsp.COMP_GEOM_TXT_TYPE)
+    comp_stl = out_path.replace(".vsp3", f"_{comp}.stl")
+    vsp.ExportFile(comp_stl, EXPORT_SET, vsp.EXPORT_STL)
+    vsp.DeleteGeom(comp_mesh_id)
+    vsp.Update()
+    print(f"  {comp:10s} → {Path(comp_stl).name}")
 
 vsp.ClearVSPModel()

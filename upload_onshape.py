@@ -1,7 +1,10 @@
 """
-upload_onshape.py — Upload model to Onshape via REST API.
+upload_onshape.py — Upload per-component STL files to Onshape.
 
-Converts the STL to binary format and imports it into a new Onshape document.
+Combines per-component STLs into a single binary STL, then uploads to
+one Onshape document. Each disconnected mesh region becomes a separate
+body in a single Part Studio.
+
 Reads credentials from .env (ONSHAPE_ACCESS_KEY, ONSHAPE_SECRET_KEY).
 """
 import os
@@ -14,6 +17,7 @@ from pathlib import Path
 
 REPO = Path(__file__).parent
 BASE_URL = "https://cad.onshape.com"
+RESULTS_DIR = REPO / "v3" / "results"
 
 # Load credentials from .env
 env_path = REPO / ".env"
@@ -27,9 +31,6 @@ if env_path.exists():
 ACCESS_KEY = os.environ["ONSHAPE_ACCESS_KEY"]
 SECRET_KEY = os.environ["ONSHAPE_SECRET_KEY"]
 
-STL_FILE = REPO / "v3" / "results" / "fixed_wing_tailsitter_optimized.stl"
-BINARY_STL = STL_FILE.with_suffix(".bin.stl")
-
 # Session with retries
 session = requests.Session()
 session.auth = (ACCESS_KEY, SECRET_KEY)
@@ -37,10 +38,10 @@ retries = Retry(total=3, backoff_factor=2, status_forcelist=[502, 503, 504])
 session.mount("https://", HTTPAdapter(max_retries=retries))
 
 
-def ascii_to_binary_stl(ascii_path, binary_path):
-    """Convert ASCII STL to binary STL (required for Onshape import)."""
+def parse_ascii_stl(path):
+    """Parse ASCII STL, return list of (normal, [v0, v1, v2]) tuples."""
     triangles = []
-    with open(ascii_path) as f:
+    with open(path) as f:
         normal = None
         verts = []
         for line in f:
@@ -55,7 +56,12 @@ def ascii_to_binary_stl(ascii_path, binary_path):
             elif line.startswith("endfacet"):
                 if normal and len(verts) == 3:
                     triangles.append((normal, verts))
-    with open(binary_path, "wb") as f:
+    return triangles
+
+
+def write_binary_stl(triangles, path):
+    """Write triangles to binary STL."""
+    with open(path, "wb") as f:
         f.write(b"\0" * 80)
         f.write(struct.pack("<I", len(triangles)))
         for normal, verts in triangles:
@@ -63,7 +69,6 @@ def ascii_to_binary_stl(ascii_path, binary_path):
             for v in verts:
                 f.write(struct.pack("<3f", *v))
             f.write(struct.pack("<H", 0))
-    return len(triangles)
 
 
 def api(method, path, **kwargs):
@@ -75,13 +80,29 @@ def api(method, path, **kwargs):
     return r.json() if r.content else {}
 
 
-# 1. Convert ASCII STL to binary
-print(f"Converting {STL_FILE.name} to binary STL...")
-n_tris = ascii_to_binary_stl(STL_FILE, BINARY_STL)
-print(f"  {n_tris} triangles, {BINARY_STL.stat().st_size / 1e6:.1f} MB")
+# Find per-component STL files
+component_stls = sorted(RESULTS_DIR.glob("fixed_wing_tailsitter_optimized_*.stl"))
+component_stls = [p for p in component_stls if ".bin." not in p.name and "_compgeom" not in p.name]
 
-# 2. Create Onshape document
-print("Creating Onshape document...")
+if not component_stls:
+    print("No per-component STL files found. Run gen_vsp3_api.py first.")
+    raise SystemExit(1)
+
+# Combine all component STLs into one binary STL
+print("Combining per-component STLs:")
+all_triangles = []
+for stl_path in component_stls:
+    comp_name = stl_path.stem.split("_")[-1]
+    tris = parse_ascii_stl(stl_path)
+    all_triangles.extend(tris)
+    print(f"  {comp_name:10s} {len(tris):6d} triangles")
+
+combined_path = RESULTS_DIR / "fixed_wing_tailsitter_optimized_combined.bin.stl"
+write_binary_stl(all_triangles, combined_path)
+print(f"  Total:     {len(all_triangles):6d} triangles ({combined_path.stat().st_size / 1e6:.1f} MB)")
+
+# Create Onshape document
+print("\nCreating Onshape document...")
 doc = api("POST", "/api/v6/documents", json={
     "name": "CanardTailsitterVTOL",
     "isPublic": True,
@@ -90,9 +111,9 @@ did = doc["id"]
 wid = doc["defaultWorkspace"]["id"]
 print(f"  Document ID: {did}")
 
-# 3. Upload binary STL — omit formatName to let Onshape auto-detect
-print(f"Uploading to Onshape...")
-with open(BINARY_STL, "rb") as f:
+# Upload combined binary STL
+print("Uploading to Onshape...")
+with open(combined_path, "rb") as f:
     r = session.post(
         f"{BASE_URL}/api/v6/translations/d/{did}/w/{wid}",
         files={"file": ("CanardTailsitterVTOL.stl", f, "application/octet-stream")},
@@ -106,11 +127,10 @@ with open(BINARY_STL, "rb") as f:
     )
     r.raise_for_status()
 
-result = r.json()
-tid = result.get("id")
+tid = r.json().get("id")
 print(f"  Translation ID: {tid}")
 
-# 4. Poll until translation completes
+# Poll until done
 for _ in range(30):
     time.sleep(3)
     st = api("GET", f"/api/v6/translations/{tid}")
@@ -123,8 +143,9 @@ for _ in range(30):
         break
     print(f"  {state}...")
 
-# 5. Verify parts exist
+# Verify
 time.sleep(2)
+print("\nOnshape document contents:")
 elements = api("GET", f"/api/v6/documents/d/{did}/w/{wid}/elements")
 for el in elements:
     if el.get("elementType") == "PARTSTUDIO":
