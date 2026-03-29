@@ -194,6 +194,9 @@ p_tc = vsp.GetXSecParm(xs_c1, "ThickChord")
 if p_tc:
     vsp.SetParmVal(p_tc, 0.09)
 
+# Round tip caps (CapUMaxOption: 0=none, 1=flat, 2=round, 3=edge, 4=sharp)
+sp(canard_id, "CapUMaxOption", "EndCap", 2.0)
+sp(canard_id, "CapUMaxLength", "EndCap", 2.0)  # larger cap extension
 vsp.Update()
 print(f"Canard — span={2*prm['span']:.3f} m, root_chord={prm['root_chord']*1000:.0f} mm")
 
